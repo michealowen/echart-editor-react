@@ -1,0 +1,116 @@
+.editor-left-container {
+  background-color: rgba(0, 0, 0, 0);
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.editor-tabs {
+  border-bottom: 0.666667px solid rgb(220, 223, 230);
+  box-shadow: none;
+  margin: 0;
+}
+
+.editor-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-header {
+  height: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.language-selector {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #666;
+  padding: 5px 15px;
+  border-radius: 3px;
+  background-color: #f7df1e;
+  transition: all 0.2s;
+}
+
+.editor-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.editor-controls .semi-button {
+  background-color: rgba(0, 0, 0, 0);
+  border: 0px none rgb(102, 102, 102);
+  color: #666;
+}
+
+.editor-controls .semi-button:hover {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.editor-controls .semi-button-primary {
+  background-color: rgb(64, 158, 255);
+  border: 0px none rgb(255, 255, 255);
+  border-radius: 0;
+  color: rgb(255, 255, 255);
+}
+
+.editor-controls .semi-button-primary:hover {
+  background-color: rgb(64, 158, 255);
+  border: 0px none rgb(255, 255, 255);
+  border-radius: 0;
+}
+
+.code-editor {
+  flex: 1;
+  background-color: rgb(255, 255, 255);
+  overflow: auto;
+  border: none;
+  position: relative;
+  max-height: 600px !important;
+}
+
+.cm-editor {
+  height: 100% !important;
+  font-size: 12px;
+  font-family: "Source Code Pro", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace;
+  overflow: hidden !important;
+  position: relative;
+}
+
+.cm-scroller {
+  font-family: "Source Code Pro", Monaco, Menlo, "Ubuntu Mono", Consolas, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  overflow: auto !important;
+  position: relative;
+  height: auto !important;
+  max-height: 100% !important;
+}
+
+.config-content {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.config-item {
+  margin-bottom: 20px;
+}
+
+.config-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}

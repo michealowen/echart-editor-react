@@ -1,0 +1,30 @@
+.app-layout {
+  width: 100vw;
+  height: 100vh;
+}
+
+.page-main {
+  margin-top: 0;
+  height: 100vh;
+  display: block;
+}
+
+.main-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.resizer {
+  width: 5px;
+  background-color: #e0e0e0;
+  cursor: col-resize;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.resizer:hover {
+  background-color: #409eff;
+}
