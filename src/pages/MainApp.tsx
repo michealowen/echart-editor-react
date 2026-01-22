@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Layout } from '@douyinfe/semi-ui'
-import EditorPanel from './components/EditorPanel'
-import ChartPanel from './components/ChartPanel'
+import { Layout, ResizeGroup, ResizeItem, ResizeHandler } from '@douyinfe/semi-ui'
+import ChartPanel from '../components/chart-panel/ChartPanel'
+import EditorPanel from '../components/editor-panel/EditorPanel'
 import './App.css'
 
 interface EChartsOption {
@@ -108,15 +108,23 @@ const defaultOption: EChartsOption = {
 
 const defaultCode = `option = ${JSON.stringify(defaultOption, null, 2)};`
 
-const App: React.FC = () => {
+const MainApp: React.FC = () => {
   const [option, setOption] = useState<EChartsOption>(defaultOption)
   const [code, setCode] = useState<string>(defaultCode)
-  const [leftWidth, setLeftWidth] = useState<number>(40)
-  const [isDragging, setIsDragging] = useState<boolean>(false)
-  const [dragStartX, setDragStartX] = useState<number>(0)
-  const [dragStartWidth, setDragStartWidth] = useState<number>(0)
 
-  const handleRun = () => {
+  // 配置项修改时同步到代码
+  useEffect(() => {
+    const newCode = `option = ${JSON.stringify(option, null, 2)};`
+    setCode(newCode)
+  }, [option])
+
+  // 代码修改时解析为配置项
+  const handleCodeChange = (newCode: string) => {
+    setCode(newCode)
+  }
+
+  // 运行代码，更新配置项
+  const handleRunCode = () => {
     try {
       const cleanedCode = code.replace(/option\s*=\s*/, '')
       const parsedOption = new Function('return ' + cleanedCode)()
@@ -127,58 +135,44 @@ const App: React.FC = () => {
     }
   }
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true)
-    setDragStartX(e.clientX)
-    setDragStartWidth(leftWidth)
-    document.body.style.cursor = 'col-resize'
-    document.body.style.userSelect = 'none'
+  // 配置项修改时直接更新
+  const handleConfigChange = (newOption: EChartsOption) => {
+    setOption(newOption)
   }
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return
-
-    const deltaX = e.clientX - dragStartX
-    const containerWidth = window.innerWidth
-    const newLeftWidth = ((dragStartWidth / 100) * containerWidth + deltaX) / containerWidth * 100
-
-    const clampedWidth = Math.max(20, Math.min(80, newLeftWidth))
-    setLeftWidth(clampedWidth)
-  }
-
-  const handleMouseUp = () => {
-    setIsDragging(false)
-    document.body.style.cursor = ''
-    document.body.style.userSelect = ''
-  }
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isDragging, dragStartX, dragStartWidth])
 
   return (
     <Layout className="app-layout">
       <Layout.Content className="page-main">
-        <div className="main-container">
-          <EditorPanel code={code} setCode={setCode} onRun={handleRun} width={leftWidth} />
-          <div
-            className="resizer"
-            onMouseDown={handleMouseDown}
-            style={{ cursor: isDragging ? 'col-resize' : 'col-resize' }}
-          />
-          <ChartPanel option={option} width={100 - leftWidth} />
-        </div>
+        <ResizeGroup direction="horizontal">
+          <ResizeItem
+            defaultSize="40%"
+            style={{
+              backgroundColor: 'rgba(var(--semi-grey-1), 1)',
+              border: 'var(--semi-color-border) 1px solid',
+            }}
+          >
+            <EditorPanel
+              option={option}
+              onConfigChange={handleConfigChange}
+              code={code}
+              onCodeChange={handleCodeChange}
+              onRun={handleRunCode}
+            />
+          </ResizeItem>
+          <ResizeHandler />
+          <ResizeItem
+            defaultSize="60%"
+            style={{
+              backgroundColor: 'rgba(var(--semi-grey-1), 1)',
+              border: 'var(--semi-color-border) 1px solid',
+            }}
+          >
+            <ChartPanel option={option} />
+          </ResizeItem>
+        </ResizeGroup>
       </Layout.Content>
     </Layout>
   )
 }
 
-export default App
+export default MainApp

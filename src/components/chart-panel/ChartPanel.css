@@ -1,18 +1,11 @@
-.chart-panel {
+.chart-container {
   background-color: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.chart-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  background-color: #fff;
   height: 100%;
+  width: 100%;
+  overflow: hidden;
+  padding: 10px;
 }
 
 .chart-title {

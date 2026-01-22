@@ -15,7 +15,9 @@
     "@uiw/react-codemirror": "^4.25.4",
     "echarts": "^5.4.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-datasheet": "^1.4.12",
+    "react-router-dom": "^7.12.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

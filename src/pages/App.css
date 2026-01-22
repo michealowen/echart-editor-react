@@ -1,0 +1,12 @@
+.app-layout {
+  width: 100vw;
+  height: 100vh;
+}
+
+.page-main {
+  margin-top: 0;
+  height: 100vh;
+  padding: 10px;
+  display: block;
+  background-color: #e0e0e0;
+}

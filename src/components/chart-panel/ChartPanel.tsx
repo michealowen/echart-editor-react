@@ -4,10 +4,9 @@ import './ChartPanel.css'
 
 interface ChartPanelProps {
   option: any
-  width: number
 }
 
-const ChartPanel: React.FC<ChartPanelProps> = ({ option, width }) => {
+const ChartPanel: React.FC<ChartPanelProps> = ({ option }) => {
   const chartRef = useRef<HTMLDivElement>(null)
   const chartInstance = useRef<echarts.ECharts | null>(null)
 
@@ -40,16 +39,10 @@ const ChartPanel: React.FC<ChartPanelProps> = ({ option, width }) => {
     }
   }, [])
 
-  useEffect(() => {
-    chartInstance.current?.resize()
-  }, [width])
-
   return (
-    <div className="chart-panel" style={{ width: `${width}%` }}>
-      <div className="chart-container">
-        <div className="chart-title">图表预览</div>
-        <div ref={chartRef} className="chart-preview" />
-      </div>
+    <div className="chart-container">
+      <div className="chart-title">图表预览</div>
+      <div ref={chartRef} className="chart-preview" />
     </div>
   )
 }
