@@ -23,7 +23,19 @@ const ChartPanel: React.FC<ChartPanelProps> = ({ option }) => {
 
   useEffect(() => {
     if (chartInstance.current && option) {
-      chartInstance.current.setOption(option, true)
+      // 处理图例自动位置
+      const processedOption = {
+        ...option,
+        legend: option.legend ? {
+          ...option.legend,
+          // 如果设置了自动位置，则移除 bottom 和 top 属性
+          ...(option.legend.autoPosition ? {
+            bottom: undefined,
+            top: undefined
+          } : {})
+        } : option.legend
+      }
+      chartInstance.current.setOption(processedOption, true)
     }
   }, [option])
 

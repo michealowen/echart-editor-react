@@ -4,7 +4,7 @@ import { IconPlayCircle } from '@douyinfe/semi-icons'
 import CodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
-import './editor-panel/EditorPanel.css'
+import './CodeEditorPanel.css'
 
 interface CodeEditorPanelProps {
   code: string

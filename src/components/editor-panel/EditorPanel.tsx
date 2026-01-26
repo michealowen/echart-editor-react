@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Tabs } from '@douyinfe/semi-ui'
-import ConfigPanel from '../ConfigPanel'
-import CodeEditorPanel from '../CodeEditorPanel'
+import ConfigPanel from './config-editor/ConfigPanel'
+import CodeEditorPanel from './code-editor/CodeEditorPanel'
 import './EditorPanel.css'
 
 interface EditorPanelProps {
