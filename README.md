@@ -6,7 +6,7 @@ ECharts 图表编辑器是一个基于 React 和 ECharts 的可视化图表配�
 
 ### 项目背景
 
-本项目使用 AI IDE Video Coding 进行开发，前期通过 Solo 模式进行功能规划，项目功能基本确定后，边体验边使用 AI Prompt 功能进行修改和优化。
+本项目使用 AI IDE Vibe Coding 进行开发，前期通过 trae solo 模式进行功能规划，项目功能基本确定后，边体验边使用 AI Prompt 功能进行修改和优化。
 
 ### 前期规划
 
