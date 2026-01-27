@@ -1,5 +1,5 @@
 import React from 'react'
-import { List, Button, Dropdown, Space, Select, Typography } from '@douyinfe/semi-ui'
+import { List, Button, Dropdown, Space, Select, Typography, Switch } from '@douyinfe/semi-ui'
 import { IconMinusCircle, IconPlusCircle, IconSetting } from '@douyinfe/semi-icons'
 import ConfigDescriptions from './ConfigDescriptions'
 import SliderInput from './SliderInput'
@@ -13,6 +13,13 @@ interface SeriesConfig {
   smooth?: boolean
   radius?: string
   center?: [string, string]
+  seriesLayoutBy?: string
+  emphasis?: {
+    focus?: string
+  }
+  label?: {
+    formatter?: string
+  }
   encode?: {
     itemName?: string
     value?: string
@@ -62,22 +69,32 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
 
   // 处理系列类型变化
   const handleSeriesTypeChange = (index: number, value: string) => {
-    onUpdate(index, { type: value })
+    // 饼图不需要 seriesLayoutBy，且 emphasis.focus 为 'self'
+    if (value === 'pie') {
+      onUpdate(index, { type: value, emphasis: { focus: 'self' } })
+    } else {
+      onUpdate(index, { type: value, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
+    }
   }
 
   // 处理系列X轴索引变化
   const handleSeriesXAxisIndexChange = (index: number, value: number) => {
-    onUpdate(index, { xAxisIndex: value })
+    onUpdate(index, { xAxisIndex: value, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
   }
 
   // 处理系列Y轴索引变化
   const handleSeriesYAxisIndexChange = (index: number, value: number) => {
-    onUpdate(index, { yAxisIndex: value })
+    onUpdate(index, { yAxisIndex: value, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
+  }
+
+  // 处理折线图平滑选项变化
+  const handleLineSmoothChange = (index: number, checked: boolean) => {
+    onUpdate(index, { smooth: checked, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
   }
 
   // 处理饼图半径变化
   const handlePieRadiusChange = (index: number, value: number) => {
-    onUpdate(index, { radius: `${value}%` })
+    onUpdate(index, { radius: `${value}%`, emphasis: { focus: 'self' } })
   }
 
   // 处理饼图中心位置变化
@@ -86,7 +103,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
     const newCenter: [string, string] = axis === 'x'
       ? [`${value}%`, currentCenter[1]]
       : [currentCenter[0], `${value}%`]
-    onUpdate(index, { center: newCenter })
+    onUpdate(index, { center: newCenter, emphasis: { focus: 'self' } })
   }
 
   // 处理 X 映射变化
@@ -95,7 +112,9 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
       encode: {
         ...series[index].encode,
         x: value
-      }
+      },
+      seriesLayoutBy: 'row',
+      emphasis: { focus: 'series' }
     })
   }
 
@@ -105,7 +124,37 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
       encode: {
         ...series[index].encode,
         y: value
+      },
+      seriesLayoutBy: 'row',
+      emphasis: { focus: 'series' }
+    })
+  }
+
+  // 处理饼图数据列变化
+  const handlePieDataColumnChange = (index: number, value: string | undefined) => {
+    // 自动将 itemName 设为第一列
+    const itemName = dataset?.source?.[0]?.[0]?.toString() || 'product'
+
+    // 将列索引映射到对应的列名
+    let columnName = value
+    if (value && dataset?.source && dataset.source.length > 0) {
+      const columnIndex = parseInt(value)
+      if (!isNaN(columnIndex) && dataset.source[0][columnIndex]) {
+        columnName = dataset.source[0][columnIndex].toString()
       }
+    }
+
+    // 更新配置，饼图不需要 seriesLayoutBy，且 emphasis.focus 为 'self'
+    onUpdate(index, {
+      encode: {
+        itemName: itemName,
+        value: columnName,
+        tooltip: columnName
+      },
+      label: {
+        formatter: `{b}: {@${columnName}} ({d}%)`
+      },
+      emphasis: { focus: 'self' }
     })
   }
 
@@ -117,6 +166,23 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
         const label = row[0]?.toString() || `行 ${index + 1}`
         return {
           value: index.toString(),
+          label: label
+        }
+      })
+    }
+    // 如果没有数据源，返回空数组
+    return []
+  }
+
+  // 生成饼图数据列选项
+  const generatePieDataColumnsOptions = () => {
+    // 从数据源的第一行（标题行）中获取选项，跳过第一列（分类列）
+    if (dataset?.source && dataset.source.length > 0) {
+      const headers = dataset.source[0]
+      return headers.slice(1).map((header, index) => {
+        const label = header?.toString() || `列 ${index + 2}`
+        return {
+          value: (index + 1).toString(), // 从1开始，因为0是分类列
           label: label
         }
       })
@@ -215,6 +281,20 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
                   ] : []),
                   ...(seriesItem.type === 'pie' ? [
                     {
+                      key: '数据列',
+                      value: (
+                        <Select
+                          value={seriesItem.encode?.value}
+                          onChange={(value) => handlePieDataColumnChange(index, value as string)}
+                          style={{ width: '100%' }}
+                          clickToHide={true}
+                          zIndex={SERIES_CONFIG_SELECT_Z_INDEX}
+                          autoAdjustOverflow={true}
+                          optionList={generatePieDataColumnsOptions()}
+                        />
+                      )
+                    },
+                    {
                       key: '饼图半径',
                       value: (
                         <SliderInput
@@ -251,6 +331,15 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
                       )
                     }
                   ] : []),
+                  ...(seriesItem.type === 'line' ? [{
+                    key: '平滑线条',
+                    value: (
+                      <Switch
+                        checked={seriesItem.smooth || false}
+                        onChange={(checked) => handleLineSmoothChange(index, checked)}
+                      />
+                    )
+                  }] : []),
                   ...(seriesItem.type === 'bar' ? [{
                     key: '柱状图配置',
                     value: <div style={{ color: '#999', fontSize: '12px' }}>暂无特殊配置项</div>
