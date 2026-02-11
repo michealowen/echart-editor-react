@@ -31,25 +31,41 @@ const defaultOption: EChartsOption = {
       type: 'line',
       smooth: true,
       seriesLayoutBy: 'row',
-      emphasis: { focus: 'series' }
+      emphasis: { focus: 'series' },
+      encode: {
+        x: 0,
+        y: 1
+      }
     },
     {
       type: 'line',
       smooth: true,
       seriesLayoutBy: 'row',
-      emphasis: { focus: 'series' }
+      emphasis: { focus: 'series' },
+      encode: {
+        x: 0,
+        y: 2
+      }
     },
     {
       type: 'line',
       smooth: true,
       seriesLayoutBy: 'row',
-      emphasis: { focus: 'series' }
+      emphasis: { focus: 'series' },
+      encode: {
+        x: 0,
+        y: 3
+      }
     },
     {
       type: 'line',
       smooth: true,
       seriesLayoutBy: 'row',
-      emphasis: { focus: 'series' }
+      emphasis: { focus: 'series' },
+      encode: {
+        x: 0,
+        y: 4
+      }
     },
     {
       type: 'pie',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { Switch, Collapse, Popover } from '@douyinfe/semi-ui'
+import { Switch, Collapse, Popover, Input } from '@douyinfe/semi-ui'
 import { IconSetting } from '@douyinfe/semi-icons'
 import type { EChartsOption } from 'echarts'
 import ConfigDescriptions from './ConfigDescriptions'
@@ -124,12 +124,74 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
     })
   }
 
-  // 更新图例底部位置
-  const handleLegendBottomChange = (value: number) => {
+  // 更新图例顶部位置
+  const handleLegendTopChange = (value: number) => {
     updateConfig({
       legend: {
         ...(localOption.legend || {}),
-        bottom: `${value}%`
+        top: `${value}%`
+      }
+    })
+  }
+
+  // 更新图例右侧位置
+  const handleLegendRightChange = (value: number) => {
+    updateConfig({
+      legend: {
+        ...(localOption.legend || {}),
+        right: `${value}%`
+      }
+    })
+  }
+
+  // 更新图例自动位置
+  const handleLegendAutoPositionChange = (checked: boolean) => {
+    updateConfig({
+      legend: {
+        ...(localOption.legend || {}),
+        top: checked ? 'auto' : undefined,
+        right: checked ? 'auto' : undefined
+      }
+    })
+  }
+
+  // 更新标题文本
+  const handleTitleTextChange = (value: string) => {
+    updateConfig({
+      title: {
+        ...(localOption.title || {}),
+        text: value
+      }
+    })
+  }
+
+  // 更新标题顶部位置
+  const handleTitleTopChange = (value: number) => {
+    updateConfig({
+      title: {
+        ...(localOption.title || {}),
+        top: `${value}%`
+      }
+    })
+  }
+
+  // 更新标题右侧位置
+  const handleTitleRightChange = (value: number) => {
+    updateConfig({
+      title: {
+        ...(localOption.title || {}),
+        right: `${value}%`
+      }
+    })
+  }
+
+  // 更新标题自动位置
+  const handleTitleAutoPositionChange = (checked: boolean) => {
+    updateConfig({
+      title: {
+        ...(localOption.title || {}),
+        top: checked ? 'auto' : undefined,
+        right: checked ? 'auto' : undefined
       }
     })
   }
@@ -161,7 +223,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
   const removeYAxis = (index: number) => {
     const { yAxis } = ensureAxesAsArray()
     if ((yAxis as any[]).length > 1) {
-      ; (yAxis as any[]).splice(index, 1)
+      (yAxis as any[]).splice(index, 1)
       updateConfig({ yAxis })
     }
   }
@@ -169,7 +231,16 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
   // 添加系列
   const addSeries = () => {
     const series = (localOption.series as any[]) || []
-    series.push({ type: 'line' })
+    const seriesIndex = series.length
+    series.push({
+      type: 'line',
+      seriesLayoutBy: 'row',
+      emphasis: { focus: 'series' },
+      encode: {
+        x: 0,
+        y: seriesIndex + 1
+      }
+    })
     updateConfig({ series })
   }
 
@@ -291,17 +362,72 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
               { key: '显示图例', value: <Switch size="small" checked={!!localOption.legend} onChange={handleLegendChange} /> },
               ...(localOption.legend ? [
                 {
-                  key: '图例底部位置',
-                  value: (
-                    <SliderInput
-                      value={parseInt((localOption.legend as any)?.bottom || '0')}
-                      onChange={handleLegendBottomChange}
-                      min={0}
-                      max={100}
-                      step={1}
-                    />
-                  )
-                }
+                  key: '自动位置',
+                  value: <Switch size="small" checked={(localOption.legend as any)?.top === 'auto'} onChange={handleLegendAutoPositionChange} />
+                },
+                ...((localOption.legend as any)?.top !== 'auto' ? [
+                  {
+                    key: '图例顶部位置',
+                    value: (
+                      <SliderInput
+                        value={parseInt((localOption.legend as any)?.top || '0')}
+                        onChange={handleLegendTopChange}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
+                    )
+                  },
+                  {
+                    key: '图例右侧位置',
+                    value: (
+                      <SliderInput
+                        value={parseInt((localOption.legend as any)?.right || '0')}
+                        onChange={handleLegendRightChange}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
+                    )
+                  }
+                ] : [])
+              ] : []),
+              { key: '显示标题', value: <Switch size="small" checked={!!localOption.title} onChange={(checked) => updateConfig({ title: checked ? {} : undefined })} /> },
+              ...(localOption.title ? [
+                {
+                  key: '标题文本',
+                  value: <Input size="small" value={(localOption.title as any)?.text || ''} onChange={(value) => handleTitleTextChange(value)} placeholder="输入标题文本" />
+                },
+                {
+                  key: '自动位置',
+                  value: <Switch size="small" checked={(localOption.title as any)?.top === 'auto'} onChange={handleTitleAutoPositionChange} />
+                },
+                ...((localOption.title as any)?.top !== 'auto' ? [
+                  {
+                    key: '标题顶部位置',
+                    value: (
+                      <SliderInput
+                        value={parseInt((localOption.title as any)?.top || '0')}
+                        onChange={handleTitleTopChange}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
+                    )
+                  },
+                  {
+                    key: '标题右侧位置',
+                    value: (
+                      <SliderInput
+                        value={parseInt((localOption.title as any)?.right || '0')}
+                        onChange={handleTitleRightChange}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
+                    )
+                  }
+                ] : [])
               ] : []),
               { key: '显示提示框', value: <Switch size="small" checked={!!localOption.tooltip} onChange={handleTooltipChange} /> }
             ]}

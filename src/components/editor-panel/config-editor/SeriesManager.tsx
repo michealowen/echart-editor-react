@@ -1,5 +1,5 @@
 import React from 'react'
-import { List, Button, Dropdown, Space, Select, Typography, Switch } from '@douyinfe/semi-ui'
+import { List, Button, Dropdown, Space, Select, Typography, Switch, Input } from '@douyinfe/semi-ui'
 import { IconMinusCircle, IconPlusCircle, IconSetting } from '@douyinfe/semi-icons'
 import ConfigDescriptions from './ConfigDescriptions'
 import SliderInput from './SliderInput'
@@ -7,6 +7,7 @@ import SliderInput from './SliderInput'
 const { Text } = Typography
 
 interface SeriesConfig {
+  name?: string
   type?: string
   xAxisIndex?: number
   yAxisIndex?: number
@@ -75,6 +76,11 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
     } else {
       onUpdate(index, { type: value, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
     }
+  }
+
+  // 处理系列名称变化
+  const handleSeriesNameChange = (index: number, value: string) => {
+    onUpdate(index, { name: value })
   }
 
   // 处理系列X轴索引变化
@@ -160,7 +166,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
 
   // 生成数据列选项
   const generateDataColumnsOptions = () => {
-    // 从数据源的每行的第一个元素中获取选项
+    // 从数据源的每行的第一列中获取选项
     if (dataset?.source && dataset.source.length > 0) {
       return dataset.source.map((row, index) => {
         const label = row[0]?.toString() || `行 ${index + 1}`
@@ -221,6 +227,10 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
                       />
                     )
                   },
+                  ...(seriesItem.type !== 'pie' ? [{
+                    key: '系列名称',
+                    value: <Input size="small" value={seriesItem.name || ''} onChange={(value) => handleSeriesNameChange(index, value)} placeholder="输入系列名称" />
+                  }] : []),
                   ...(seriesItem.type !== 'pie' ? [{
                     key: '绑定X轴',
                     value: (
@@ -331,23 +341,29 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
                       )
                     }
                   ] : []),
-                  ...(seriesItem.type === 'line' ? [{
-                    key: '平滑线条',
-                    value: (
-                      <Switch
-                        checked={seriesItem.smooth || false}
-                        onChange={(checked) => handleLineSmoothChange(index, checked)}
-                      />
-                    )
-                  }] : []),
-                  ...(seriesItem.type === 'bar' ? [{
-                    key: '柱状图配置',
-                    value: <div style={{ color: '#999', fontSize: '12px' }}>暂无特殊配置项</div>
-                  }] : []),
-                  ...(seriesItem.type === 'scatter' ? [{
-                    key: '散点图配置',
-                    value: <div style={{ color: '#999', fontSize: '12px' }}>暂无特殊配置项</div>
-                  }] : [])
+                  ...(seriesItem.type === 'line' ? [
+                    {
+                      key: '平滑线条',
+                      value: (
+                        <Switch
+                          checked={seriesItem.smooth || false}
+                          onChange={(checked) => handleLineSmoothChange(index, checked)}
+                        />
+                      )
+                    }
+                  ] : []),
+                  ...(seriesItem.type === 'bar' ? [
+                    {
+                      key: '柱状图配置',
+                      value: <div style={{ color: '#999', fontSize: '12px' }}>暂无特殊配置项</div>
+                    }
+                  ] : []),
+                  ...(seriesItem.type === 'scatter' ? [
+                    {
+                      key: '散点图配置',
+                      value: <div style={{ color: '#999', fontSize: '12px' }}>暂无特殊配置项</div>
+                    }
+                  ] : [])
                 ]}
               />
             </div>
