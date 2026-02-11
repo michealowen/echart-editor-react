@@ -24,8 +24,8 @@ interface SeriesConfig {
     itemName?: string
     value?: string
     tooltip?: string
-    x?: string
-    y?: string
+    x?: number
+    y?: number
   }
 }
 
@@ -107,7 +107,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
   }
 
   // 处理 X 映射变化
-  const handleEncodeXChange = (index: number, value: string | undefined) => {
+  const handleEncodeXChange = (index: number, value: number | undefined) => {
     onUpdate(index, {
       encode: {
         ...series[index].encode,
@@ -119,7 +119,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
   }
 
   // 处理 Y 映射变化
-  const handleEncodeYChange = (index: number, value: string | undefined) => {
+  const handleEncodeYChange = (index: number, value: number | undefined) => {
     onUpdate(index, {
       encode: {
         ...series[index].encode,
@@ -165,7 +165,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
       return dataset.source.map((row, index) => {
         const label = row[0]?.toString() || `行 ${index + 1}`
         return {
-          value: index.toString(),
+          value: index,
           label: label
         }
       })
@@ -255,7 +255,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
                       value: (
                         <Select
                           value={seriesItem.encode?.x}
-                          onChange={(value) => handleEncodeXChange(index, value as string)}
+                          onChange={(value) => handleEncodeXChange(index, value as number)}
                           style={{ width: '100%' }}
                           clickToHide={true}
                           zIndex={SERIES_CONFIG_SELECT_Z_INDEX}
@@ -269,7 +269,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
                       value: (
                         <Select
                           value={seriesItem.encode?.y}
-                          onChange={(value) => handleEncodeYChange(index, value as string)}
+                          onChange={(value) => handleEncodeYChange(index, value as number)}
                           style={{ width: '100%' }}
                           clickToHide={true}
                           zIndex={SERIES_CONFIG_SELECT_Z_INDEX}
