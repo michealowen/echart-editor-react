@@ -3,54 +3,13 @@ import { Routes, Route } from 'react-router-dom'
 import { Layout, ResizeGroup, ResizeItem, ResizeHandler, Toast } from '@douyinfe/semi-ui'
 import ChartPanel from '../components/chart-panel/ChartPanel'
 import EditorPanel from '../components/editor-panel/EditorPanel'
+import type { EChartsOption } from 'echarts'
 import './App.css'
 
-interface EChartsOption {
-  legend?: {
-    bottom?: string
-    autoPosition?: boolean
-  }
-  tooltip?: {
-    trigger?: string
-    showContent?: boolean
-  }
-  dataset?: {
-    source: any[][]
-  }
-  xAxis?: {
-    type?: string
-  }
-  yAxis?: {
-    gridIndex?: number
-  }
-  grid?: {
-    top?: string
-  }
-  series?: Array<{
-    type?: string
-    smooth?: boolean
-    seriesLayoutBy?: string
-    id?: string
-    radius?: string
-    center?: [string, string]
-    emphasis?: {
-      focus?: string
-    }
-    label?: {
-      formatter?: string
-    }
-    encode?: {
-      itemName?: string
-      value?: string
-      tooltip?: string
-    }
-  }>
-}
+
 
 const defaultOption: EChartsOption = {
-  legend: {
-    autoPosition: true
-  },
+  legend: {},
   tooltip: {
     trigger: 'axis',
     showContent: true

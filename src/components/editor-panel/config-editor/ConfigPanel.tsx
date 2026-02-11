@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Switch, Collapse, Popover } from '@douyinfe/semi-ui'
 import { IconSetting } from '@douyinfe/semi-icons'
+import type { EChartsOption } from 'echarts'
 import ConfigDescriptions from './ConfigDescriptions'
 import AxisManager from './AxisManager'
 import SeriesManager from './SeriesManager'
@@ -8,66 +9,24 @@ import DataEditor from './DataEditor'
 import SliderInput from './SliderInput'
 import './ConfigPanel.css'
 
+type AxisType = 'value' | 'category' | 'time' | 'log'
+
+type XAxisPosition = 'bottom' | 'top'
+type YAxisPosition = 'left' | 'right'
+
 interface AxisConfig {
-  type?: string
+  type?: AxisType
   name?: string
-  position?: string
+  position?: XAxisPosition | YAxisPosition
   offset?: number
-  alignTicks?: boolean
   gridIndex?: number
+  min?: number | 'dataMin'
   axisLine?: {
     show?: boolean
     lineStyle?: {
       color?: string
     }
   }
-  axisLabel?: {
-    formatter?: string
-  }
-}
-
-interface EChartsOption {
-  legend?: {
-    bottom?: string
-    autoPosition?: boolean
-  }
-  tooltip?: {
-    trigger?: string
-    showContent?: boolean
-  }
-  dataset?: {
-    source: any[][]
-  }
-  xAxis?: AxisConfig | AxisConfig[]
-  yAxis?: AxisConfig | AxisConfig[]
-  grid?: {
-    top?: string
-    right?: string
-    left?: string
-    width?: string
-    height?: string
-  }
-  series?: Array<{
-    type?: string
-    smooth?: boolean
-    seriesLayoutBy?: string
-    id?: string
-    radius?: string
-    center?: [string, string]
-    emphasis?: {
-      focus?: string
-    }
-    label?: {
-      formatter?: string
-    }
-    encode?: {
-      itemName?: string
-      value?: string
-      tooltip?: string
-    }
-    xAxisIndex?: number
-    yAxisIndex?: number
-  }>
 }
 
 interface ConfigPanelProps {
@@ -81,10 +40,12 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
 
   // 使用 useMemo 缓存 spreadsheetData 的计算结果
   const spreadsheetData = useMemo(() => {
-    return (option.dataset?.source || []).map((row: any[]) => {
+    const dataset = option.dataset
+    const source = Array.isArray(dataset) ? dataset[0]?.source : dataset?.source
+    return ((source as any) || []).map((row: any[]) => {
       return row.map(cell => ({ value: cell }))
     })
-  }, [option.dataset?.source])
+  }, [option.dataset])
 
   // 防抖定时器引用
   const debounceTimerRef = useRef<number | null>(null)
@@ -137,7 +98,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
       yAxis = [yAxis]
     }
     if (!xAxis) {
-      xAxis = [{ type: 'category', alignTicks: true }]
+      xAxis = [{ type: 'category' }]
     }
     if (!yAxis) {
       yAxis = [{ type: 'value', alignTicks: true }]
@@ -173,37 +134,25 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
     })
   }
 
-
-
-  // 更新图例自动位置
-  const handleLegendAutoPositionChange = (checked: boolean) => {
-    updateConfig({
-      legend: {
-        ...(localOption.legend || {}),
-        autoPosition: checked
-      }
-    })
-  }
-
   // 添加X轴
   const addXAxis = () => {
     const { xAxis } = ensureAxesAsArray()
-    xAxis.push({ type: 'category', alignTicks: true })
+      ; (xAxis as any[]).push({ type: 'category' })
     updateConfig({ xAxis })
   }
 
   // 添加Y轴
   const addYAxis = () => {
     const { yAxis } = ensureAxesAsArray()
-    yAxis.push({ type: 'value', alignTicks: true })
+      ; (yAxis as any[]).push({ type: 'value', alignTicks: true })
     updateConfig({ yAxis })
   }
 
   // 删除X轴
   const removeXAxis = (index: number) => {
     const { xAxis } = ensureAxesAsArray()
-    if (xAxis.length > 1) {
-      xAxis.splice(index, 1)
+    if ((xAxis as any[]).length > 1) {
+      ; (xAxis as any[]).splice(index, 1)
       updateConfig({ xAxis })
     }
   }
@@ -211,29 +160,29 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
   // 删除Y轴
   const removeYAxis = (index: number) => {
     const { yAxis } = ensureAxesAsArray()
-    if (yAxis.length > 1) {
-      yAxis.splice(index, 1)
+    if ((yAxis as any[]).length > 1) {
+      ; (yAxis as any[]).splice(index, 1)
       updateConfig({ yAxis })
     }
   }
 
   // 添加系列
   const addSeries = () => {
-    const series = localOption.series || []
+    const series = (localOption.series as any[]) || []
     series.push({ type: 'line' })
     updateConfig({ series })
   }
 
   // 删除系列
   const removeSeries = (index: number) => {
-    const series = localOption.series || []
+    const series = (localOption.series as any[]) || []
     series.splice(index, 1)
     updateConfig({ series })
   }
 
   // 更新系列
   const updateSeries = (index: number, updates: any) => {
-    const series = localOption.series || []
+    const series = (localOption.series as any[]) || []
     series[index] = { ...series[index], ...updates }
     updateConfig({ series })
   }
@@ -296,13 +245,13 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
   // 获取坐标轴数组
   const getXAxes = (): AxisConfig[] => {
     const { xAxis } = ensureAxesAsArray()
-    return xAxis
+    return xAxis as AxisConfig[]
   }
 
   // 获取坐标轴数组
   const getYAxes = (): AxisConfig[] => {
     const { yAxis } = ensureAxesAsArray()
-    return yAxis
+    return yAxis as AxisConfig[]
   }
 
 
@@ -342,23 +291,17 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
               { key: '显示图例', value: <Switch size="small" checked={!!localOption.legend} onChange={handleLegendChange} /> },
               ...(localOption.legend ? [
                 {
-                  key: '自动位置',
-                  value: <Switch size="small" checked={!!localOption.legend?.autoPosition} onChange={handleLegendAutoPositionChange} />
-                },
-                ...(!localOption.legend?.autoPosition ? [
-                  {
-                    key: '图例底部位置',
-                    value: (
-                      <SliderInput
-                        value={parseInt(localOption.legend?.bottom || '0')}
-                        onChange={handleLegendBottomChange}
-                        min={0}
-                        max={100}
-                        step={1}
-                      />
-                    )
-                  }
-                ] : [])
+                  key: '图例底部位置',
+                  value: (
+                    <SliderInput
+                      value={parseInt((localOption.legend as any)?.bottom || '0')}
+                      onChange={handleLegendBottomChange}
+                      min={0}
+                      max={100}
+                      step={1}
+                    />
+                  )
+                }
               ] : []),
               { key: '显示提示框', value: <Switch size="small" checked={!!localOption.tooltip} onChange={handleTooltipChange} /> }
             ]}
@@ -375,7 +318,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
                 onRemove={removeXAxis}
                 onUpdate={(index, updates) => {
                   const { xAxis } = ensureAxesAsArray()
-                  xAxis[index] = { ...xAxis[index], ...updates }
+                    ; (xAxis as any)[index] = { ...(xAxis as any)[index], ...updates }
                   updateConfig({ xAxis })
                 }}
               />
@@ -389,7 +332,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
                 onRemove={removeYAxis}
                 onUpdate={(index, updates) => {
                   const { yAxis } = ensureAxesAsArray()
-                  yAxis[index] = { ...yAxis[index], ...updates }
+                    ; (yAxis as any)[index] = { ...(yAxis as any)[index], ...updates }
                   updateConfig({ yAxis })
                 }}
               />
@@ -404,7 +347,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
                 key: 'Grid 顶部位置',
                 value: (
                   <SliderInput
-                    value={parseInt(localOption.grid?.top || '55')}
+                    value={parseInt((localOption.grid as any)?.top || '55')}
                     onChange={handleGridTopChange}
                     min={0}
                     max={100}
@@ -416,7 +359,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
                 key: 'Grid 左侧位置',
                 value: (
                   <SliderInput
-                    value={parseInt(localOption.grid?.left || '30')}
+                    value={parseInt((localOption.grid as any)?.left || '30')}
                     onChange={handleGridLeftChange}
                     min={0}
                     max={100}
@@ -428,7 +371,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
                 key: 'Grid 宽度',
                 value: (
                   <SliderInput
-                    value={parseInt(localOption.grid?.width || '40')}
+                    value={parseInt((localOption.grid as any)?.width || '40')}
                     onChange={handleGridWidthChange}
                     min={0}
                     max={100}
@@ -440,7 +383,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
                 key: 'Grid 高度',
                 value: (
                   <SliderInput
-                    value={parseInt(localOption.grid?.height || '30')}
+                    value={parseInt((localOption.grid as any)?.height || '30')}
                     onChange={handleGridHeightChange}
                     min={0}
                     max={100}
@@ -454,13 +397,13 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
 
         <Collapse.Panel header="系列配置" itemKey="series">
           <SeriesManager
-            series={localOption.series || []}
+            series={(localOption.series as any) || []}
             onAdd={addSeries}
             onRemove={removeSeries}
             onUpdate={updateSeries}
             xAxisCount={getXAxes().length}
             yAxisCount={getYAxes().length}
-            dataset={localOption.dataset}
+            dataset={Array.isArray(localOption.dataset) ? localOption.dataset[0] as any : localOption.dataset as any}
           />
         </Collapse.Panel>
       </Collapse>

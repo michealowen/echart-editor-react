@@ -5,12 +5,16 @@ import ConfigDescriptions from './ConfigDescriptions'
 
 const { Text } = Typography
 
+type AxisType = 'value' | 'category' | 'time' | 'log'
+
+type XAxisPosition = 'bottom' | 'top'
+type YAxisPosition = 'left' | 'right'
+
 interface AxisConfig {
-  type?: string
+  type?: AxisType
   name?: string
-  position?: string
+  position?: XAxisPosition | YAxisPosition
   offset?: number
-  alignTicks?: boolean
   gridIndex?: number
   min?: number | 'dataMin'
   axisLine?: {
@@ -18,9 +22,6 @@ interface AxisConfig {
     lineStyle?: {
       color?: string
     }
-  }
-  axisLabel?: {
-    formatter?: string
   }
 }
 
@@ -37,20 +38,26 @@ const AXIS_DROP_DOWN_Z_INDEX = AXIS_MANAGER_BASE_Z_INDEX + 1
 const AXIS_CONFIG_SELECT_Z_INDEX = AXIS_DROP_DOWN_Z_INDEX + 1
 
 const AxisManager: React.FC<AxisManagerProps> = ({ type, axes, onAdd, onRemove, onUpdate }) => {
-  const handleTypeChange = (index: number, value: string) => {
-    onUpdate(index, { type: value })
+  const handleTypeChange = (index: number, value: string | number | any[] | Record<string, any> | undefined) => {
+    if (value !== undefined && typeof value === 'string') {
+      onUpdate(index, { type: value as AxisType })
+    }
   }
 
   const handleNameChange = (index: number, value: string) => {
     onUpdate(index, { name: value })
   }
 
-  const handlePositionChange = (index: number, value: string) => {
-    onUpdate(index, { position: value })
+  const handlePositionChange = (index: number, value: string | number | any[] | Record<string, any> | undefined) => {
+    if (value !== undefined && typeof value === 'string') {
+      onUpdate(index, { position: value as XAxisPosition | YAxisPosition })
+    }
   }
 
-  const handleOffsetChange = (index: number, value: number) => {
-    onUpdate(index, { offset: value })
+  const handleOffsetChange = (index: number, value: number | string | undefined) => {
+    if (typeof value === 'number') {
+      onUpdate(index, { offset: value })
+    }
   }
 
   const handleMinChange = (index: number, value: number | string | undefined) => {
@@ -70,8 +77,10 @@ const AxisManager: React.FC<AxisManagerProps> = ({ type, axes, onAdd, onRemove, 
     }
   }
 
-  const handleGridIndexChange = (index: number, value: number) => {
-    onUpdate(index, { gridIndex: value })
+  const handleGridIndexChange = (index: number, value: number | string | undefined) => {
+    if (typeof value === 'number') {
+      onUpdate(index, { gridIndex: value })
+    }
   }
 
   const handleColorChange = (index: number, value: string) => {
@@ -114,7 +123,7 @@ const AxisManager: React.FC<AxisManagerProps> = ({ type, axes, onAdd, onRemove, 
                     key: '类型', value: (
                       <Select
                         value={axis.type || (type === 'x' ? 'category' : 'value')}
-                        onChange={(value) => handleTypeChange(index, value as string)}
+                        onChange={(value) => handleTypeChange(index, value)}
                         style={{ width: '100%' }}
                         clickToHide={true}
                         zIndex={AXIS_CONFIG_SELECT_Z_INDEX}
@@ -133,7 +142,7 @@ const AxisManager: React.FC<AxisManagerProps> = ({ type, axes, onAdd, onRemove, 
                     key: '位置', value: (
                       <Select
                         value={axis.position || (type === 'x' ? 'bottom' : 'left')}
-                        onChange={(value) => handlePositionChange(index, value as string)}
+                        onChange={(value) => handlePositionChange(index, value)}
                         style={{ width: '100%' }}
                         clickToHide={true}
                         zIndex={AXIS_CONFIG_SELECT_Z_INDEX}
@@ -143,10 +152,10 @@ const AxisManager: React.FC<AxisManagerProps> = ({ type, axes, onAdd, onRemove, 
                       </Select>
                     )
                   },
-                  { key: '偏移量', value: <InputNumber size="small" value={axis.offset || 0} onChange={(value) => handleOffsetChange(index, value as number)} min={0} /> },
+                  { key: '偏移量', value: <InputNumber size="small" value={axis.offset || 0} onChange={(value) => handleOffsetChange(index, value)} min={0} /> },
                   { key: '最小刻度', value: <InputNumber size="small" value={typeof axis.min === 'number' ? axis.min : undefined} onChange={(value) => handleMinChange(index, value?.toString() || '')} placeholder="输入最小刻度" /> },
-                  { key: '网格索引', value: <InputNumber size="small" value={axis.gridIndex || 0} onChange={(value) => handleGridIndexChange(index, value as number)} min={0} /> },
-                  { key: '颜色', value: <Input size="small" value={(axis.axisLine?.lineStyle?.color) || '#333'} onChange={(value) => handleColorChange(index, value)} placeholder="输入颜色值" /> }
+                  { key: '网格索引', value: <InputNumber size="small" value={axis.gridIndex || 0} onChange={(value) => handleGridIndexChange(index, value)} min={0} /> },
+                  { key: '颜色', value: <Input size="small" value={axis.axisLine?.lineStyle?.color || '#333'} onChange={(value) => handleColorChange(index, value)} placeholder="输入颜色值" /> }
                 ]}
               />
             </div>
