@@ -14,7 +14,6 @@ interface SeriesConfig {
   smooth?: boolean
   radius?: string
   center?: [string, string]
-  seriesLayoutBy?: string
   emphasis?: {
     focus?: string
   }
@@ -70,11 +69,10 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
 
   // 处理系列类型变化
   const handleSeriesTypeChange = (index: number, value: string) => {
-    // 饼图不需要 seriesLayoutBy，且 emphasis.focus 为 'self'
     if (value === 'pie') {
       onUpdate(index, { type: value, emphasis: { focus: 'self' } })
     } else {
-      onUpdate(index, { type: value, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
+      onUpdate(index, { type: value, emphasis: { focus: 'series' } })
     }
   }
 
@@ -85,17 +83,17 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
 
   // 处理系列X轴索引变化
   const handleSeriesXAxisIndexChange = (index: number, value: number) => {
-    onUpdate(index, { xAxisIndex: value, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
+    onUpdate(index, { xAxisIndex: value, emphasis: { focus: 'series' } })
   }
 
   // 处理系列Y轴索引变化
   const handleSeriesYAxisIndexChange = (index: number, value: number) => {
-    onUpdate(index, { yAxisIndex: value, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
+    onUpdate(index, { yAxisIndex: value, emphasis: { focus: 'series' } })
   }
 
   // 处理折线图平滑选项变化
   const handleLineSmoothChange = (index: number, checked: boolean) => {
-    onUpdate(index, { smooth: checked, seriesLayoutBy: 'row', emphasis: { focus: 'series' } })
+    onUpdate(index, { smooth: checked, emphasis: { focus: 'series' } })
   }
 
   // 处理饼图半径变化
@@ -119,7 +117,6 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
         ...series[index].encode,
         x: value
       },
-      seriesLayoutBy: 'row',
       emphasis: { focus: 'series' }
     })
   }
@@ -131,7 +128,6 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
         ...series[index].encode,
         y: value
       },
-      seriesLayoutBy: 'row',
       emphasis: { focus: 'series' }
     })
   }
@@ -150,7 +146,7 @@ const SeriesManager: React.FC<SeriesManagerProps> = ({ series, onAdd, onRemove, 
       }
     }
 
-    // 更新配置，饼图不需要 seriesLayoutBy，且 emphasis.focus 为 'self'
+    // 更新配置，饼图 emphasis.focus 为 'self'
     onUpdate(index, {
       encode: {
         itemName: itemName,

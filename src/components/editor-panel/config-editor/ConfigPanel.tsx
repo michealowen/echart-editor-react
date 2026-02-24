@@ -234,7 +234,6 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ option, onChange }) => {
     const seriesIndex = series.length
     series.push({
       type: 'line',
-      seriesLayoutBy: 'row',
       emphasis: { focus: 'series' },
       encode: {
         x: 0,

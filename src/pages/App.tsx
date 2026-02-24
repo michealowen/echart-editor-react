@@ -30,7 +30,6 @@ const defaultOption: EChartsOption = {
     {
       type: 'line',
       smooth: true,
-      seriesLayoutBy: 'row',
       emphasis: { focus: 'series' },
       encode: {
         x: 0,
@@ -40,7 +39,6 @@ const defaultOption: EChartsOption = {
     {
       type: 'line',
       smooth: true,
-      seriesLayoutBy: 'row',
       emphasis: { focus: 'series' },
       encode: {
         x: 0,
@@ -50,7 +48,6 @@ const defaultOption: EChartsOption = {
     {
       type: 'line',
       smooth: true,
-      seriesLayoutBy: 'row',
       emphasis: { focus: 'series' },
       encode: {
         x: 0,
@@ -60,7 +57,6 @@ const defaultOption: EChartsOption = {
     {
       type: 'line',
       smooth: true,
-      seriesLayoutBy: 'row',
       emphasis: { focus: 'series' },
       encode: {
         x: 0,
